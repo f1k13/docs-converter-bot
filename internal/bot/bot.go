@@ -40,6 +40,7 @@ func (b *Bot) Start() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 	updates, err := b.API.GetUpdatesChan(u)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,10 +48,15 @@ func (b *Bot) Start() {
 		if update.Message == nil {
 			continue
 		}
+		if update.Message == nil {
+			log.Println("Получено обновление без сообщения")
+			continue
+		}
 		chatID := update.Message.Chat.ID
 		text := update.Message.Text
 		if text == "/start" {
 			b.sendFormatFilesSelection(chatID, formats)
+			continue
 		}
 		if validateFormat(text, formats) {
 			userSessions[chatID] = &UserSession{SelectedFormat: text}
@@ -59,6 +65,7 @@ func (b *Bot) Start() {
 			continue
 		}
 		fileID := update.Message.Document.FileID
+
 		fileName := update.Message.Document.FileName
 		if update.Message.Document != nil {
 			session, exist := userSessions[chatID]
